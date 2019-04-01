@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="generator" content="Hugo 0.55.0-DEV" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Lim Zheng Guang">
+    <meta property="og:url" content="http://example.org/post/grbl-controller/">
+
+    <title>GRBL Arduino Controller Circuit - fixthelights</title>
+    <meta property="og:title" content="GRBL Arduino Controller Circuit - fixthelights">
+    <meta property="og:type" content="article">
+    <meta name="description" content="">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro|Arvo:400,700">
+    <link rel="stylesheet" href="/css/highlight.css">
+    <link rel="stylesheet" href="/css/journal.css">
+    <link href="/index.xml" rel="alternate" type="application/rss+xml" title="fixthelights">
+
+  </head>
+
+  <body>
+    <div class="container">
+
+      <nav class="site-nav">
+        <a href="http://example.org/">Index</a>
+      </nav>
+
+
+  <article class="post">
+    <header class="post-header">
+      <h1 class="post-title">GRBL Arduino Controller Circuit</h1>
+      <time class="post-date" datetime="2019-04-02 05:01:26 &#43;08">02 Apr 2019</time>
+    </header>
+
+    
+
+<p>Hi, this is my first instructable. I&rsquo;m trying this out as it goes, so bear with me. I will try to explain as much as I can, but I do not have enough time or resources for visual representations, and on the topic of that I&rsquo;ll target beginners and intermediate users (like myself) in the field of electrical engineering.</p>
+
+<p>This project focuses on the circuitry and software aspects of a DIY CNC build. Before we begin, I would like to talk about the final product to give you an idea of what to expect from this instructable. Keep in mind that this instructable serves only as a reference and not a full step by step tutorial.</p>
+
+<h1 id="final-product">Final Product</h1>
+
+<p><img src="/grbl-controller.jpg" alt="Image of completed GRBL Arduino controller circuit." /></p>
+
+<p>This stepper driver controls 4 stepper motors, 1 on the X-Axis, 2 on the Y-Axis and 1 on the Z-Axis. I used grbl, an Open Source CNC Controller software. It is uploaded onto the arduino once and controlled via a computer (like a raspberry pi). An explanation of grbl and it&rsquo;s features can be found in grbl&rsquo;s repo on Github (<a href="https://github.com/gnea/grbl">https://github.com/gnea/grbl</a>).</p>
+
+<p>Onto the technical specs of the stepper driver circuit, it uses Pololu&rsquo;s DRV8825 Stepper Motor Driver (<a href="https://www.pololu.com/product/2133">https://www.pololu.com/product/2133</a>). My 4 steppers are NEMA 17, 12V, ranging from 1A to 2A. The DRV8825 supports from 8.2V to 45V, and a current limit of 2.2A while properly cooled with heat-sinks. The microcontroller is an Arduino Nano. The documentation on grbl displays the pinout of the Arduino Uno, but pinout of the Arduino Nano is slightly different and can be seen here (<a href="https://www.instructables.com/id/GRBL-Pinout-Arduino-Nano-v30/">https://www.instructables.com/id/GRBL-Pinout-Arduino-Nano-v30/</a>).</p>
+
+<h1 id="prerequisites">Prerequisites</h1>
+
+<p>Skills:
+- Some soldering experience
+- Perseverance, when troubleshooting (it gets pretty bad)</p>
+
+<p>Components or Parts:
+- 4 Pololu DRV8825 Stepper Motor Driver
+- 1 Arduino Nano
+- 4 100uF electrolytic capacitors (I used 16V due to their small form factor, voltage isn&rsquo;t listed in Pololu&rsquo;s website hence it may be incorrect)
+- Wires (I salvaged cat-6a ethernet cables I had laying around)
+- Prototyping board
+- (Optional) Some female header pins for connecting the steppers
+- (Optional) Heat-sinks for DRV8825</p>
+
+<p>Equipment:
+- Soldering iron and solder
+- Wire clippers</p>
+
+<blockquote>
+<p>Note: With some effort you can make this work with other devices such as the more popular A4988 Stepper Driver and other Arduinos such as the Arduino Mega.</p>
+</blockquote>
+
+<h1 id="getting-components-ready">Getting Components Ready</h1>
+
+<p>We have to get our components ready for assembly. First, solder the necessary header pins into the individual boards. Since I ordered the DRV8825 Driver with soldered on header pins, I only had to solder the arduino nano&rsquo;s pin headers.</p>
+
+<p>Secondly, after getting the header pins into place, position all the components on the prototyping board. I visualized all the components and how they were going to be wired up, before setting them down. This helps me during the assembly process since it reduces the wire routing needed to be done to connect the drivers to the arduino. I will talk about the wiring process in the following step.</p>
+
+<h1 id="wiring-the-components">Wiring the Components</h1>
+
+<p>This step is where things start to get messy. I will split this process up into 2 parts.</p>
+
+<pre><code>1. Setting up the DRV8825 Driver only
+2. Setting up of the 4 drivers and arduino
+</code></pre>
+
+<h1 id="drv8825-connection">DRV8825 Connection</h1>
+
+<p>Most of the information here can be taken from Pololu&rsquo;s description on the driver. I&rsquo;ll list the general steps to take for one driver, and you can then replicate it for the remaining 3 drivers using the same instructions.</p>
+
+<p>Firstly, we have to attach a 100uF capacitor at the VMOT and GND of the driver. Ensure that the capacitor&rsquo;s polarity is correct, and that + is connected to VMOT while - is connected to GND. The capacitor prevents the driver from getting damaged by LC voltage spikes.</p>
+
+<p>Secondly, we short the RESET and SLEEP pins on the driver with the Arduino&rsquo;s 5V, and connect the driver&rsquo;s GND pin to the Arduino&rsquo;s GND. Careful as there are 2 GND pins on the driver. A schematic of this setup is provided by Pololu on their website.</p>
+
+<p>Thridly, we connect the STEP and DIR pins to their respective axis pins on the Arduino. This may be hard to visualize so let me provide an example. Assuming we are working on the Z-Axis driver, we have to connect the STEP pin on the driver to D4 on the Arduino, which is the Arduino&rsquo;s Z-Axis STEP pin, and the DIR pin on the driver to D7 on the Arduino, which is the Arduino&rsquo;s Z-Axis DIR (direction) pin.</p>
+
+<p>Optionally you should connect your female header pins to the stepper pins on the driver (4 pins). You can also solder your stepper wires directly to the board, but it is generally not recommended unless you are certain the direction of the motor is correct (especially since we require further configuration of the 2 motors for the Y-axis).</p>
+
+<h1 id="finished-board">Finished Board</h1>
+
+<p>Now that we have determined the connections necessary, we can solder them. This is an error prone and time consuming process so, try to be patient. I will not touch on details about the wire positions needed to connect the circuit together, since it is unique to your own build.</p>
+
+<p>After soldering all the connections required for the 4 drivers to the arduino, you may optionally want to setup your limit switches on the arduino for &ldquo;homing&rdquo; in grbl. It is recommended to follow this step due to it&rsquo;s benefits, but I will skip this step for now for simplicity sake. More information on wiring limit switches can be found here (<a href="https://github.com/gnea/grbl/wiki/Wiring-Limit-Switches">https://github.com/gnea/grbl/wiki/Wiring-Limit-Switches</a>). Without limit switches, homing is not possible.</p>
+
+<p>Also you should adjust the current limit potentiometer to prevent damaging your stepper. Instructions are provided in Pololu&rsquo;s website as usual.</p>
+
+<p>With the connections all done, we can move on to uploading grbl to the Arduino, and testing your controller with the next step.</p>
+
+<h1 id="upload-and-test">Upload and Test</h1>
+
+<p>This page provides instructions to flash grbl to your arduino (<a href="https://github.com/gnea/grbl/wiki/Flashing-Grbl-to-an-Arduino">https://github.com/gnea/grbl/wiki/Flashing-Grbl-to-an-Arduino</a>). After flashing, you should be able to send commands to your Arduino via Arduino IDE serial monitor. I recommend getting a GUI capable for sending GCodes to grbl. A list of such applications can be found on grbl&rsquo;s wiki (<a href="https://github.com/gnea/grbl/wiki">https://github.com/gnea/grbl/wiki</a>).</p>
+
+<p>Now you can connect your stepper motor to your grbl driver and test each motor before connecting all of them.</p>
+
+<p>An important note for the special 2 stepper Y-Axis, you have to ensure that both the motors travel in the same direction. Your 2 Y-Axis drivers&rsquo;s STEP and DIR should be cloned from the same arduino pin. You can swap the wire pairs on the stepper to in turn (see what I did there), change the direction of a motor so that both are traveling in the same direction. You can skip this note if you do not have 2 steppers for an axis.</p>
+
+<p>Test your CNC by using the GUI to &ldquo;jog&rdquo; an axis, you should see the motor moving on that axis.</p>
+
+<h1 id="happy-ending-hopefully">Happy Ending (Hopefully)</h1>
+
+<p>Thanks for reading this instructable. Yep, no images, I will be improving this instructable in the future. Keep in mind that this instructable serves only as a reference and not a full step by step tutorial, as you can tell from the links I provided for certain instructions. Feel free to ask any questions and I&rsquo;ll try my best to answer. Thank you!</p>
+
+
+  </article>
+
+
+      <footer class="site-footer">
+        <span itemscope itemtype="http://schema.org/Person">
+          <link itemprop="url" href="http://example.org/">
+          <span itemprop="name">Lim Zheng Guang</span>
+
+          ,
+          <span itemprop="jobTitle">Year 3 Student</span> at
+          <span itemprop="memberOf" itemscope itemtype="http://schema.org/Organization"><a itemprop="url" href="https://www.sp.edu.sg/soc"><span itemprop="name">Singapore Polytechnic</span></a></span><br>
+
+          <a itemprop="sameAs" href="https://github.com/fixthelights" title="GitHub">GH</a>
+
+          
+
+          <a itemprop="sameAs" href="https://pgp.mit.edu/pks/lookup?op=get&amp;search=0x1111111111111111" title="GPG 0x1111111111111111 (fingerprint: 0000 0000 0000 0000 0000  0000 0000 0000 0000 0000)">GPG</a>
+        </span>
+
+        
+      </footer>
+    </div>
+
+  <script src="/js/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+
+  </body>
+</html>
+
