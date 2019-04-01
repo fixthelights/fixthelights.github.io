@@ -2,21 +2,21 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>fixthelights</title>
-    <link>http://example.org/</link>
+    <link>https://fixthelights.github.io/</link>
     <description>Recent content on fixthelights</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 02 Apr 2019 05:01:26 +0800</lastBuildDate>
     
-	<atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="https://fixthelights.github.io/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
       <title>GRBL Arduino Controller Circuit</title>
-      <link>http://example.org/post/grbl-controller/</link>
+      <link>https://fixthelights.github.io/post/grbl-controller/</link>
       <pubDate>Tue, 02 Apr 2019 05:01:26 +0800</pubDate>
       
-      <guid>http://example.org/post/grbl-controller/</guid>
+      <guid>https://fixthelights.github.io/post/grbl-controller/</guid>
       <description>Hi, this is my first instructable. I&amp;rsquo;m trying this out as it goes, so bear with me. I will try to explain as much as I can, but I do not have enough time or resources for visual representations, and on the topic of that I&amp;rsquo;ll target beginners and intermediate users (like myself) in the field of electrical engineering.
 This project focuses on the circuitry and software aspects of a DIY CNC build.</description>
     </item>
